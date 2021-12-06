@@ -1,11 +1,11 @@
-service: my-lambda-service
+service: github-webhook
 
 package:
   exclude:
     - '*.md'
     - '.env*'
-    - 'node_modules/**'
     - .serverless/**
+    - 'node_modules/**'
 
 plugins:
   - serverless-offline
@@ -25,25 +25,14 @@ provider:
     - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
 
 functions:
-  my-lambda:
-    handler: api/handlers/mylambda.handler
+  github:
+    handler: api/handlers/github.handler
+    role: CodebuildInvocationRole
     events:
       - http:
-          path: /api/mylambda
-          method: get
-          cors:
-            origin: '*'
-            headers:
-              - Content-Type
-              - X-Amz-Date
-              - Authorization
-              - X-Api-Key
-              - X-Amz-Security-Token
-              - X-Amz-User-Agent
-            allowCredentials: false
-            cacheControl: 'max-age=600, s-maxage=600, proxy-revalidate'
+          path: /api/github
+          method: post
     environment:
-
 
 custom:
   stage: ${opt:stage, self:provider.stage}
@@ -51,4 +40,27 @@ custom:
     httpPort: 4000
 
 resources:
-  Description: My lambda stack
+  Description: Github webhook stack
+  Resources:
+    CodebuildInvocationRole:
+      Type: AWS::IAM::Role
+      Properties:
+        AssumeRolePolicyDocument:
+          Version: '2012-10-17'
+          Statement:
+            - Effect: 'Allow'
+              Principal:
+                Service:
+                  - 'lambda.amazonaws.com'
+                  - 'codebuild.amazonaws.com'
+              Action:
+                - sts:AssumeRole
+        Policies:
+          - PolicyName: 'CodebuildInvocation'
+            PolicyDocument:
+              Version: '2012-10-17'
+              Statement:
+                - Effect: 'Allow'
+                  Action:
+                    - codebuild:StartBuild
+                  Resource: 'arn:aws:codebuild:us-east-1:465213713140:project/insights-webui-angular-deploy'

@@ -1,11 +1,12 @@
 {
-  "name": "serverless-lambda-boilerplate",
+  "name": "github-webhook",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
   "scripts": {
     "sls": "serverless",
     "deploy": "sls deploy",
+    "remove": "sls remove",
     "sls:offline": "sls offline",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -14,6 +15,7 @@
   "devDependencies": {
     "serverless": "^2.66.2",
     "serverless-offline": "^8.3.1",
+    "aws-sdk": "^2.1044.0",
     "serverless-dotenv-plugin": "^3.10.0"
   },
   "dependencies": {}
